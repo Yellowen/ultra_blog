@@ -26,6 +26,8 @@ from feeds import LatestPosts, CategoryFeed
 urlpatterns = patterns('',
         url(r'^posts/([^/]+)/$', "ultra_blog.views.view_post",
             name="view-post"),
+        url(r'^register/$', "ultra_blog.views.register",
+            name="register-view"),
         (r'^tags/([^/]+)/$', "ultra_blog.views.view_tag"),
         (r'^categories/([^/]+)/$', "ultra_blog.views.view_category"),
         (r'^types/(\w+)/$', "ultra_blog.views.view_type"),
