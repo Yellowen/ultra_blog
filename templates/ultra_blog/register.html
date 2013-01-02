@@ -1,0 +1,21 @@
+{% extends "ultra_blog/base.html" %}
+{% load i18n %}
+
+{% block extrahead %}
+  <title>{{ self.title }}</title>
+{% endblock extrahead %}
+
+{% block content %}
+<div id="generalcontent">
+<div class="paragraph">
+<h2>{% trans "Register a blog" %}</h2>
+<p>{% trans "Please read the" %}<a href="#">{% trans "Term Of Service" %}</a> {% trans "before create a new blog," %}</p>
+<form action="" method="POST">{% csrf_token %}
+<table class="formtable">
+  {{ form.as_table }}
+</table>
+<input type="submit">
+</form>
+</div>
+</div>
+{% endblock %}

@@ -22,7 +22,6 @@ from django.conf import settings
 
 from base import Post
 from micro import MicroPost
-from config import Setting
 
 
 class PostModerator(CommentModerator):
@@ -39,9 +38,9 @@ def on_comment_was_posted(sender, comment, request, *args, **kwargs):
     except ImportError:
         return
 
-    apikey = Setting.get_setting("spam_apikey")
+    apikey = request.blog.spam_apikey
     if apikey:
-        if Setting.get_setting("antispam") == "0":
+        if request.blog.antispam == "0":
             ak = Akismet(
                 key=apikey,
                 blog_url='http://%s/' % request.META["HTTP_HOST"]

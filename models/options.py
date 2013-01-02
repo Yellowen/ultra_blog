@@ -1,6 +1,6 @@
-# -----------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 #    Ultra Blog - Data type base blog application for Vanda platform
-#    Copyright (C) 2011 Some Hackers In Town
+#    Copyright (C) 2011-2013 Sameer Rahmani <lxsameer@gnu.org>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,26 +15,18 @@
 #    You should have received a copy of the GNU General Public License along
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-# -----------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+from django.db import models
+from django.contrib.sites.models import Site
+from django.utils.translation import ugettext as _
 
-from vpkg.base import BaseApplication
-from vpkg import vpkg
 
+class BlogOptions(models.Model):
+    site = models.ForeignKey(Site, verbose_name=_("blog"),
+                             unique=True)
 
-class UltraBlog(BaseApplication):
-    """
-    Implementation of BaseApplication interface for news application.
-    this class allow vpkg to discover it.
-    """
+    class Meta:
+        app_label = "ultra_blog"
+        verbose_name_plural = _("blog options")
+        verbose_name = _('blog option')
 
-    application_name = "UltraBlog"
-    priority = 90
-    urls = [
-        (['^blog/', '^ultra_page/'], None),
-        ]
-
-    settings = {
-        #'COMMENTS_APP': 'ultra_blog',
-        }
-
-vpkg.register(UltraBlog)

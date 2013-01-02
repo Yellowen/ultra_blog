@@ -1,6 +1,6 @@
-# -----------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 #    Ultra Blog - Data type base blog application for Vanda platform
-#    Copyright (C) 2011 Some Hackers In Town
+#    Copyright (C) 2011-2013 Sameer Rahmani <lxsameer@gnu.org>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,11 +15,96 @@
 #    You should have received a copy of the GNU General Public License along
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-# -----------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 import logging
+
 from django import forms
+from django.http import Http404
+from django.shortcuts import render_to_response as rr
+from django.template import RequestContext
+from django.conf import settings
 
 from models import Post
+
+
+class ClassView(object):
+    """
+    This class is a base class for all the class views.
+    """
+
+    #: Page title
+    title = ""
+
+    #: Template file
+    template = ""
+
+    #: Specify the view scope
+    is_global = True
+
+    #: Contexts that will pass to template
+    context = {}
+
+    #: Current request object
+    request = None
+
+    @property
+    def media_url(self):
+        if self.is_global:
+            return settings.MEDIA_URL
+        else:
+            template_name = self.request.blog.template
+            return "%s%s/" % (settings.MEDIA_URL,
+                              template_name)
+
+    def get_template(self, request=None, template=None):
+        """
+        Return a suitable template path based on blog default theme.
+        """
+        req = request or self.request
+        if self.is_global:
+            return template or self.template
+        else:
+            template_name = req.blog.options.template
+            return "%s/%s" % (template_name,
+                              template or self.template)
+
+    def rr(self, request=None, context={}, template=None):
+        """
+        Wrap around render_to_response funtion of django.
+        """
+        from copy import copy
+
+        req = request or self.request
+        ctx = context or self.context
+
+        ctx["self"] = lambda: self
+
+        return rr(self.get_template(template=template),
+                  ctx,
+                  context_instance=RequestContext(req))
+
+    def index(self, request):
+        """
+        View method.
+        """
+        if not self.is_global == request.is_global:
+            raise Http404()
+
+        self.request = request
+
+        if request.method == "POST":
+            return self.on_post(request)
+        else:
+            return self.on_get(request)
+
+    def on_get(self, request):
+        pass
+
+    def on_post(self, request):
+        pass
+
+    def __call__(self, *args, **kwargs):
+        return self.index(*args, **kwargs)
 
 
 class PostType(object):

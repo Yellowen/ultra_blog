@@ -1,6 +1,6 @@
-# -----------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 #    Ultra Blog - Data type base blog application for Vanda platform
-#    Copyright (C) 2011-2012 Behnam AhmadKhanBeigi <b3hnam@gnu.org>
+#    Copyright (C) 2011-2013 Sameer Rahmani <lxsameer@gnu.org>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,11 +15,7 @@
 #    You should have received a copy of the GNU General Public License along
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-# -----------------------------------------------------------------------------
-
-# Other people who work on this file
-# Sameer Rahmani <lxsameer@gnu.org>
-
+# ---------------------------------------------------------------------------
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render_to_response as rr
 from django.template import RequestContext
@@ -28,9 +24,10 @@ from django.http import HttpResponse, Http404, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sites.models import Site
 from django.contrib.auth.decorators import login_required
-from models.base import Category
-from models import Post, Setting
-from base import post_types
+
+from ultra_blog.models.base import Category
+from ultra_blog.models import Post, Setting
+from ultra_blog.base import post_types
 
 
 def blog_index(request):
@@ -247,3 +244,4 @@ def micro_api(request):
 @login_required
 def register(request):
     return HttpResponse()
+

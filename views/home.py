@@ -1,6 +1,6 @@
 # ---------------------------------------------------------------------------
 #    Ultra Blog - Data type base blog application for Vanda platform
-#    Copyright (C) 2011-2013 Yellowem Inc
+#    Copyright (C) 2011-2013 Sameer Rahmani <lxsameer@gnu.org>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -16,13 +16,22 @@
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 # ---------------------------------------------------------------------------
+from django.http import HttpResponseForbidden
 
-from django.conf.urls.defaults import patterns, url
+from ultra_blog.base import ClassView
 
 
-urlpatterns = patterns('',
-        url(r'^register/$', "ultra_blog.views.register.index",
-            name="register-view"),
-        url(r'^$', "ultra_blog.views.home.index",
-            name="home"),
-)
+class UltraBlogIndex (ClassView):
+    template = "ultra_blog/index.html"
+    is_global = True
+    title = "Yellowers.com"
+
+    def on_get(self, request):
+        self.request = request
+        return self.rr()
+
+    def on_post(self, request):
+        return HttpResponseForbidden()
+
+
+index = UltraBlogIndex()

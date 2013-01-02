@@ -21,8 +21,6 @@ from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
-from config import Setting
-
 
 class TextPost(models.Model):
     """
@@ -40,7 +38,7 @@ class TextPost(models.Model):
         from pygments.formatters import HtmlFormatter
 
         # Loading current highlighting style
-        current_style = Setting.get_setting("highlight_style")
+        current_style = self.blog.highlight_style
 
         # Find all the code tags
         code_pattern = re.compile("(\[code ([A-Za-z]+)\ *\](.*?)\[/code\])",

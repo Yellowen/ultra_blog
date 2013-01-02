@@ -1,0 +1,21 @@
+{% extends "ultra_blog/base.html" %}
+{% load i18n %}
+
+{% block extrahead %}
+  <title>{{ self.title }}</title>
+{% endblock extrahead %}
+
+{% block content %}
+
+<div id="generalcontent">
+<div id="features" class="paragraph">
+<h2>{% trans "Features" %}</h2>
+<ul>
+  <li>{% trans "Free/Open Source software under the GPLv2" %}.</li>
+  <li>{% trans "Multiple author per blog" %}.</li>
+  <li>{% trans "Completely optional advertisements" %}</li>
+  <li>{% trans "FREE domain or sub-domain mapping" %}</li>
+</ul>
+</div>
+</div>
+{% endblock %}

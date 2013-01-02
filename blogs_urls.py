@@ -19,10 +19,22 @@
 
 from django.conf.urls.defaults import patterns, url
 
+from feeds import LatestPosts, CategoryFeed
+
 
 urlpatterns = patterns('',
+        url(r'^posts/([^/]+)/$', "ultra_blog.views.blog.view_post",
+            name="view-post"),
         url(r'^register/$', "ultra_blog.views.register.index",
             name="register-view"),
-        url(r'^$', "ultra_blog.views.home.index",
-            name="home"),
+        (r'^tags/([^/]+)/$', "ultra_blog.views.blog.view_tag"),
+        (r'^categories/([^/]+)/$', "ultra_blog.views.blog.view_category"),
+        (r'^types/(\w+)/$', "ultra_blog.views.blog.view_type"),
+        (r'^filter/$', "ultra_blog.views.blog.filter"),
+        (r'^feed/category/(?P<slug>\w+)/$', CategoryFeed()),
+        (r'^feed/$', LatestPosts()),
+        (r'^api/micro/$', 'ultra_blog.views.blog.micro_api'),
+        url(r'^new/comment/$', 'ultra_blog.comments.post_comment',
+            name="new-ucomment"),
+        (r'^$', "ultra_blog.views.blog.blog_index"),
 )

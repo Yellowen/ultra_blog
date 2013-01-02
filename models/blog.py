@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------
 #    Ultra Blog - Data type base blog application for Vanda platform
-#    Copyright (C) 2011 Sameer Rahmani <lxsameer@gnu.org>
+#    Copyright (C) 2011-2013 Sameer Rahmani <lxsameer@gnu.org>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -16,14 +16,16 @@
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 # -----------------------------------------------------------------------------
+import datetime
 
 from django.db import models
 from django.utils.translation import ugettext as _
+from django.contrib.sites.models import Site
 
 
-class Setting (models.Model):
+class Blog (models.Model):
     """
-    Configuration model.
+    Blog model.
     """
     STYLES = [
         ("", "---"),
@@ -52,15 +54,16 @@ class Setting (models.Model):
         ["1", "Akismet"],
         ]
 
-    _DEFAULT = {
-        'post_per_page': 10,
-        'comment_per_page': 10,
-        "highlight_style": "emacs",
-        "antispam": "0",
-        "spam_apikey": None,
-        }
+    title = models.CharField(_("title"), max_length=128)
+
+    founder = models.ForeignKey('auth.User', verbose_name=_("founder"),
+                                related_name="founder")
+    authors = models.ManyToManyField('auth.User',
+                                     verbose_name=_("authors"), null=True,
+                                     related_name="authors")
+
     active = models.BooleanField(_("Active"),
-                                 default=False)
+                                 default=True)
 
     post_per_page = models.IntegerField(default=10,
                             verbose_name=_("How many post per page?"))
@@ -71,6 +74,7 @@ class Setting (models.Model):
     highlight_style = models.CharField(_("Highlight style"),
                                        max_length=16,
                                        choices=STYLES,
+                                       default="emacs",
                                        blank=True)
 
     antispam = models.CharField(_("Anti-Spam"),
@@ -85,36 +89,58 @@ class Setting (models.Model):
                                    null=True,
                                    blank=True)
 
-    @classmethod
-    def get_setting(cls, setting_name, default=None):
-        """
-        Return the field data of given setting_name if exists or
-        return default value for it.
-        """
-        if setting_name in cls._DEFAULT:
-            try:
-                return getattr(Setting.objects.get(active=True), setting_name)
-            except Setting.DoesNotExist:
-                return cls._DEFAULT[setting_name]
-        else:
-            return default
+    template = models.CharField(_("template"), default="lxsameer.com",
+                                max_length="64")
 
-    def save(self, *argc, **kwargs):
+    @property
+    def aliases(self):
         """
-        Only one active setting allowed.
+        Return a list of current blog aliases
         """
-        if self.active:
-            try:
-                pre = Setting.objects.get(active=True)
-                if pre is not self:
-                    pre.active = False
-                    pre.save()
-            except Setting.DoesNotExist:
-                pass
+        a = BlogAlias.objects.filter(blog=self)
+        a = " | ".join([i.domain for i in a])
+        return a
 
-        super(Setting, self).save(*argc, **kwargs)
+    def __unicode__(self):
+        return "%s-%s" % (self.founder, self.title)
 
     class Meta:
         app_label = "ultra_blog"
-        verbose_name_plural = _("Settings")
-        verbose_name = _('Setting')
+        verbose_name_plural = _("Blogs")
+        verbose_name = _('Blog')
+
+
+class BlogAlias(models.Model):
+    blog = models.ForeignKey(Blog, verbose_name=_("Blog"))
+    domain = models.URLField(_("domain"), unique=True)
+
+    def __unicode__(self):
+        return "%s:%s" % (self.domain, self.blog)
+
+    class Meta:
+        app_label = "ultra_blog"
+        verbose_name_plural = _("Aliases")
+        verbose_name = _('Alis')
+
+
+class InvitationCode(models.Model):
+    code = models.CharField(_("invatation code"), max_length=40)
+    date = models.DateTimeField(_("used date"), blank=True,
+                                null=True)
+    active = models.BooleanField(_("active"), default=True)
+    blog = models.ForeignKey(Blog, verbose_name=_("Used for"),
+                             blank=True,
+                             null=True)
+
+    def save(self, *args, **kwargs):
+        self.date = datetime.datetime.now()
+        super(InvitationCode, self).save(*args, **kwargs)
+
+    def __unicode__(self):
+        return "%s:%s" % (self.code, self.active)
+
+    class Meta:
+        app_label = "ultra_blog"
+        verbose_name_plural = _("invitation codes")
+        verbose_name = _('invitation code')
+    

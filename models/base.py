@@ -29,10 +29,10 @@ from django.contrib.sites.managers import CurrentSiteManager
 from tagging.fields import TagField
 from tagging.utils import get_tag_list
 
-from dtable.models import DTModel
+from blog import Blog
 
 
-class Category(DTModel):
+class Category(models.Model):
     """
     Each post will be tagged for just one category.
     """
@@ -46,11 +46,7 @@ class Category(DTModel):
     parent = models.ForeignKey('self', verbose_name=_("Parent"),
                                blank=True, null=True)
 
-    site = models.ForeignKey(Site, verbose_name=_("Site"),
-                             null=True, blank=True)
-
-    objects = models.Manager()
-    sites = CurrentSiteManager()
+    blog = models.ForeignKey(Blog, verbose_name=_("blog"))
 
     def get_childs(self):
         return Category.objects.filter(parent=self)
@@ -68,14 +64,14 @@ class Category(DTModel):
         return reverse('ultra_blog.views.view_category', args=[self.slug])
 
     class Meta:
-        unique_together = (('site', 'slug'))
+        unique_together = (('blog', 'slug'))
         app_label = "ultra_blog"
         verbose_name_plural = _("Categories")
         verbose_name = _('Category')
         ordering = ["title"]
 
 
-class Post (DTModel):
+class Post (models.Model):
     """
     Post model.
     author and datetime will be filled automaticly.
@@ -119,11 +115,7 @@ class Post (DTModel):
                                            editable=False,
                                            verbose_name=_('Last Update'))
 
-    site = models.ForeignKey(Site, verbose_name=_("Site"),
-                             null=True, blank=True)
-
-    objects = models.Manager()
-    sites = CurrentSiteManager()
+    blog = models.ForeignKey(Blog, verbose_name=_("blog"))
 
     def is_updated(self):
         """

@@ -1,0 +1,93 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% block head %}
+  <script src="/socket/" type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ self.media_url }}css/common.css" type="text/css" />
+  <link rel="stylesheet" href="{{ self.media_url }}css/fonts.css" type="text/css" />
+  <script src="{{ self.media_url }}js/jquery.min.js" type="text/javascript"></script>
+  <script src="{{ self.media_url }}js/socket.io.js" type="text/javascript"></script>
+  <script src="{{ self.media_url }}js/socket.js" type="text/javascript"></script>
+  <script src="{{ self.media_url }}js/notify.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ self.media_url }}css/blog/style.css" type="text/css" />
+  <link rel="stylesheet" href="{{ self.media_url }}css/blog/tab.css" type="text/css" />
+
+  <link rel="stylesheet" href="{{ self.media_url }}css/blog/night.css" type="text/css" />
+
+{% endblock %}
+{% block extrahead %}
+{% endblock extrahead %}
+</head>
+<body>
+<notificationarea tips="{% url notify.views.tips %}"><notify></notify></notificationarea>
+{% block body %}
+
+<header>
+{% block header %}
+
+<div class="menubar">
+
+<nav class="left">
+<ul class="vertical">
+  <li><a href="{% url register-view %}">{% trans "Register" %}</a></li>
+  <li><a href="/about/me/">{% trans "About" %}</a></li>
+</ul>
+</nav>
+
+<nav class="right">
+<ul class="vertical">
+     <li>{% trans "Welcome" %} <b> {{ request.user }}</b></li>
+     {% if request.user.is_authenticated %}
+        <li><a href="{{ DAARMAAN_DASHBOARD }}" target=_blank>{% trans "Dashboard" %}</a>
+        <li><a href="{{ DAARMAAN_LOGOUT }}">{% trans "Logout" %}</a>
+     {% else %}
+        <li><a href="{{ DAARMAAN_SERVER }}/#register" target=_blank>{% trans "Sign up" %}</a></li>
+        <li><a href="{{ DAARMAAN_SERVER }}/">{% trans "Login" %}</a></li>
+     {% endif %}
+</ul>
+</nav>
+</div>
+<!--
+<searchbar>
+  <form action="/search/" method="GET">
+    <input type="text" name="search" id="search"/>
+    <input type="submit" value=""/>
+  </form>
+</searchbar>
+-->
+<div id="sitetitle">
+  <a href="/"><h1>Yellowers</h1></a>
+  <span>What's on your minde</span>
+  <beta>{% trans "BETA" %}</beta>
+</div>
+<planet></planet>
+<div id="centercloud">
+</div>
+<div id="clouds">
+</div>
+
+{% endblock header %}
+</header>
+<content>
+{% block content %}
+{% endblock content %}
+</content>
+
+{% block footer %}
+<footer>
+<ul class="vertical">
+  <li><a href="#">{% trans "Term of service" %}</a> .</li>
+  <li><a href="#">{% trans "Privacy terms" %}</a></li>
+</ul>
+<div id="copyright">
+  <p class="pinfo">Version: {{ VERSION }} | Python: {{ PYVERSION }} | Django: {{ DJVERSION }} | Vanda: {{ VANDAVERSION }}</p>
+  <p><a href="/page/copyright/" title="Copyright notes">©</a> 20012-2013 <a href="http://www.yellowen.com/">{% trans "Yellowen" %}</a>.
+  {% trans "Powered by" %}<a href="http://www.vandaproject.com">{% trans "Vanda Platform" %}</a>.</p>
+</div>
+</footer>
+{% endblock footer %}
+
+{% endblock body %}
+</body>
+</html>

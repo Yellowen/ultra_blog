@@ -1,0 +1,13 @@
+{% extends "ultra_blog/base.html" %}
+{% load i18n %}
+
+{% block extrahead %}
+  <title>{{ self.title }}</title>
+{% endblock extrahead %}
+
+{% block content %}
+<div id="generalcontent">
+  <h2>{% trans "Blog registeration is done" %}.</h2>
+  <p>{% trans "Now you can use your dashboard to control your blog." %}</p>
+</div>
+{% endblock %}
