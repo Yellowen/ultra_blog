@@ -26,6 +26,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.sessions.backends.db import SessionStore
 from django.contrib.auth.signals import user_logged_in
+from django.utils import translation
 
 from ultra_blog.models import BlogAlias
 
@@ -45,12 +46,16 @@ class BlogMiddleware(object):
 
     def process_request(self, request):
         global_domain = True
-        try:        
+        try:
             blogalias = BlogAlias.objects.get(domain=request.META['HTTP_HOST'])
             global_domain = False
             blog = blogalias.blog
             setattr(request, "blog", blog)
             setattr(request, "domain", blogalias)
+
+            # Setup blog language
+            translation.activate(blog.language)
+            request.LANGUAGE_CODE = translation.get_language()
 
         except BlogAlias.DoesNotExist:
             blogalias = None

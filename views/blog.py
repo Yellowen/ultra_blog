@@ -26,9 +26,46 @@ from django.contrib.sites.models import Site
 from django.contrib.auth.decorators import login_required
 
 from ultra_blog.models.base import Category
-from ultra_blog.models import Post, Setting
-from ultra_blog.base import post_types
+from ultra_blog.models import Post
+from ultra_blog.base import post_types, ClassView
 
+
+class Blog(ClassView):
+    """
+    This class is responsible for viewing a blog.
+    """
+
+    template = "blog_index.html"
+    is_global = False
+    title = ""
+
+    def on_get(self, request):
+        ppp = request.blog.post_per_page
+        post_list = Post.objects.filter(publish=True,
+                                        blog=request.blog)
+
+        paginator = Paginator(post_list, ppp)
+
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+
+        try:
+            posts = paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            postss = paginator.page(paginator.num_pages)
+
+        self.posts = posts
+        self.types = post_types.get_types_complex()
+        self.rssfeed = "/feed/"
+        self.blog = request.blog
+        return self.rr()
+
+    def on_post(self, request):
+        pass
+
+index = Blog()
 
 def blog_index(request):
     """

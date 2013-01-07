@@ -1,6 +1,6 @@
 # ---------------------------------------------------------------------------
 #    Ultra Blog - Data type base blog application for Vanda platform
-#    Copyright (C) 2011-2013 Yellowem Inc
+#    Copyright (C) 2011-2013 Sameer Rahmani <lxsameer@gnu.org>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -16,21 +16,35 @@
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 # ---------------------------------------------------------------------------
+from django.contrib.auth.models import User
+from tastypie import fields
+from tastypie.resources import ModelResource
 
-from django.conf.urls.defaults import patterns, url, include
-from tastypie.api import Api
-
-from api import BlogResource
-
-
-v1_api = Api(api_name='v1')
-v1_api.register(BlogResource())
+from ultra_blog.models import Category, Blog
 
 
-urlpatterns = patterns('',
-        (r'^api/', include(v1_api.urls)),
-        url(r'^register/$', "ultra_blog.views.register.index",
-            name="register-view"),
-        url(r'^$', "ultra_blog.views.home.index",
-            name="home"),
-)
+class UltraBlogResource(ModelResource):
+    """
+    Basic resource class for any blog dependent resource.
+    """
+    def apply_filters(self, request, applicable_filters):
+        return self.get_object_list(request).filter(
+            blog=request.blog,
+            **applicable_filters)
+
+
+class PostResource(ModelResource):
+    class Meta:
+        pass
+
+
+class BlogResource(ModelResource):
+    class Meta:
+        queryset = Blog.objects.all()
+        filtering = {"authors":"id"}
+
+
+class CategoryResource(UltraBlogResource):
+    class Meta:
+        queryset = Category.objects.all()
+

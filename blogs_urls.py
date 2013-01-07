@@ -17,12 +17,20 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 # ---------------------------------------------------------------------------
 
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls.defaults import patterns, url, include
+from tastypie.api import Api
 
 from feeds import LatestPosts, CategoryFeed
+from api import CategoryResource
+
+
+v1_api = Api(api_name='v1')
+v1_api.register(CategoryResource())
+v1_api.register(BlogResource())
 
 
 urlpatterns = patterns('',
+        (r'^api/', include(v1_api.urls)),
         url(r'^posts/([^/]+)/$', "ultra_blog.views.blog.view_post",
             name="view-post"),
         url(r'^register/$', "ultra_blog.views.register.index",
@@ -36,5 +44,5 @@ urlpatterns = patterns('',
         (r'^api/micro/$', 'ultra_blog.views.blog.micro_api'),
         url(r'^new/comment/$', 'ultra_blog.comments.post_comment',
             name="new-ucomment"),
-        (r'^$', "ultra_blog.views.blog.blog_index"),
+        (r'^$', "ultra_blog.views.blog.index"),
 )

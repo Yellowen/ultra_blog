@@ -64,7 +64,7 @@ class ClassView(object):
         if self.is_global:
             return template or self.template
         else:
-            template_name = req.blog.options.template
+            template_name = req.blog.template
             return "%s/%s" % (template_name,
                               template or self.template)
 

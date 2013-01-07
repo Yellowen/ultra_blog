@@ -62,6 +62,8 @@ class Blog (models.Model):
                                      verbose_name=_("authors"), null=True,
                                      related_name="authors")
 
+    language = models.CharField(_("language"), max_length=3)
+
     active = models.BooleanField(_("Active"),
                                  default=True)
 
@@ -112,7 +114,11 @@ class Blog (models.Model):
 
 class BlogAlias(models.Model):
     blog = models.ForeignKey(Blog, verbose_name=_("Blog"))
-    domain = models.URLField(_("domain"), unique=True)
+    domain = models.CharField(_("domain"), unique=True,
+                              max_length=256)
+    urls = models.CharField(_("urls module"),
+                            blank=True, null=True,
+                            max_length=64)
 
     def __unicode__(self):
         return "%s:%s" % (self.domain, self.blog)
@@ -124,7 +130,8 @@ class BlogAlias(models.Model):
 
 
 class InvitationCode(models.Model):
-    code = models.CharField(_("invatation code"), max_length=40)
+    code = models.CharField(_("invatation code"), max_length=40,
+                            unique=True)
     date = models.DateTimeField(_("used date"), blank=True,
                                 null=True)
     active = models.BooleanField(_("active"), default=True)

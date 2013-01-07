@@ -68,42 +68,34 @@ class RegisterBlog(ClassView):
             # If form is valid, (invitation code)
             code = form.cleaned_data["code"]
             domain = form.cleaned_data["name"].lower()
-
+            lang = form.cleaned_data["lang"]
             try:
                 site = BlogAlias.objects.get(domain=domain)
                 form.errors["name"] = [_("This domain is not available")]
 
             except BlogAlias.DoesNotExist:
                 # Every thing is ok
-
-                # Check for subdomain validation
-                sub_pattern = re.compile("^[a-z][a-z0-9\-]+$")
+                # Create the blog entry
+                blog = Blog(founder=request.user)
+                blog.language = lang
+                blog.save()
+                blog.authors.add(request.user)
+                blog.save()
                 
-                if not sub_pattern.match(domain):
-                    forms.errors["name"] = [
-                        _("invalid subdomain name. Don't use invalid characters."),
-                        ]
-                else:
-                    # Create the blog entry
-                    blog = Blog(founder=request.user)
-                    blog.save()
-                    blog.authors.add(request.user)
-                    blog.save()
-
-                    # Create block alias
-                    subdomain = "%s.%s" % (domain,
-                                           settings.DOMAIN)
-
-                    alias = BlogAlias(domain=subdomain,
-                                      blog=blog)
-                    alias.save()
-
-                    # expire the invitation code
-                    code.blog = blog
-                    code.active = False
-                    code.save()
-
-                    # Show the done view
+                # Create block alias
+                subdomain = "%s.%s" % (domain,
+                                       settings.DOMAIN)
+                
+                alias = BlogAlias(domain=subdomain,
+                                  blog=blog)
+                alias.save()
+                
+                # expire the invitation code
+                code.blog = blog
+                code.active = False
+                code.save()
+                
+                # Show the done view
                 return self.done(request, blog)
 
         self.context["form"] = form
