@@ -19,8 +19,9 @@
 from django.contrib.auth.models import User
 from tastypie import fields
 from tastypie.resources import ModelResource
+from tastypie.authorization import Authorization
 
-from ultra_blog.models import Category, Blog
+from ultra_blog.models import Category, Blog, BlogAlias
 
 
 class UltraBlogResource(ModelResource):
@@ -37,11 +38,30 @@ class PostResource(ModelResource):
     class Meta:
         pass
 
+class UserResource(ModelResource):
+    class Meta:
+        queryset = User.objects.all()
+        resource_name = 'auth/user'
+        excludes = ['email', 'password', 'is_superuser', "is_staff"]
+        authorization= Authorization()
+    
 
 class BlogResource(ModelResource):
+    authors = fields.ToManyField(UserResource, "authors")
+
+    def dehydrate(self, bundle):
+        pk = bundle.data["id"]
+        aliases = BlogAlias.objects.filter(blog__pk=pk)
+        result = {}
+        for alias in aliases:
+            result.update({alias.domain: alias.pk})
+        bundle.data['aliases'] = result
+        return bundle
+
     class Meta:
         queryset = Blog.objects.all()
-        filtering = {"authors":"id"}
+        filtering = {"authors": ["id", "exact"]}
+        authorization= Authorization()
 
 
 class CategoryResource(UltraBlogResource):

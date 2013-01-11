@@ -26,7 +26,6 @@ from api import CategoryResource
 
 v1_api = Api(api_name='v1')
 v1_api.register(CategoryResource())
-v1_api.register(BlogResource())
 
 
 urlpatterns = patterns('',

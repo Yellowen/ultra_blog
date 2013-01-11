@@ -20,10 +20,11 @@
 from django.conf.urls.defaults import patterns, url, include
 from tastypie.api import Api
 
-from api import BlogResource
+from ultra_blog.api import BlogResource, UserResource
 
 
 v1_api = Api(api_name='v1')
+v1_api.register(UserResource())
 v1_api.register(BlogResource())
 
 
